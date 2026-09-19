@@ -1,4 +1,4 @@
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, like } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
@@ -53,6 +53,30 @@ function baseGamesQuery(db: Database) {
 /** All games ordered by title. */
 export async function getAllGames(db: Database): Promise<Game[]> {
     const rows = await baseGamesQuery(db).orderBy(asc(games.title));
+    return rows.map(mapGame);
+}
+
+/** Filter games by title, case-insensitive. */
+export function filterGamesByTitle(gamesList: Game[], query: string): Game[] {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) {
+        return gamesList;
+    }
+
+    return gamesList.filter((game) => game.title.toLowerCase().includes(normalizedQuery));
+}
+
+/** Search games by a title fragment, case-insensitive, ordered alphabetically. */
+export async function searchGamesByTitle(db: Database, query: string): Promise<Game[]> {
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) {
+        return getAllGames(db);
+    }
+
+    const rows = await baseGamesQuery(db)
+        .where(like(games.title, `%${normalizedQuery}%`))
+        .orderBy(asc(games.title));
+
     return rows.map(mapGame);
 }
 
