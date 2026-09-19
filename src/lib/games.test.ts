@@ -3,6 +3,7 @@ import { createTestDatabase } from '../../db/test-helpers';
 import { categories, publishers, games } from '../../db/schema';
 import type { Database } from './db';
 import {
+    filterGamesByTitle,
     getAllGames,
     getAllGameIds,
     getGameById,
@@ -50,6 +51,18 @@ describe('games data-access helpers', () => {
         const ids = await getAllGameIds(db);
         const all = await getAllGames(db);
         expect(ids).toEqual(all.map((g) => g.id));
+    });
+
+    it('filters games by title ignoring case and surrounding whitespace', async () => {
+        await seedGames(db, 3);
+        const all = await getAllGames(db);
+
+        expect(filterGamesByTitle(all, '  game 02  ')).toHaveLength(1);
+        expect(filterGamesByTitle(all, 'GAME 0').map((game) => game.title)).toEqual([
+            'Game 01',
+            'Game 02',
+            'Game 03',
+        ]);
     });
 
     it('fetches a single game by id', async () => {

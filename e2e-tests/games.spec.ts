@@ -24,6 +24,37 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter games by title as the user types', async ({ page }) => {
+    await test.step('Navigate to homepage and verify the search field is available', async () => {
+      await page.goto('/');
+      const searchInput = page.getByTestId('game-search');
+      await expect(searchInput).toBeVisible();
+      await expect(searchInput).toHaveAttribute('type', 'search');
+    });
+
+    await test.step('Filter the list to matching game titles', async () => {
+      const searchInput = page.getByTestId('game-search');
+      await searchInput.fill('server');
+
+      const visibleCards = page.locator('[data-testid="game-card"]:visible');
+      await expect(visibleCards).toHaveCount(2);
+
+      const matchingTitles = await visibleCards.evaluateAll((cards) =>
+        cards.map((card) => (card as HTMLElement).getAttribute('data-game-title') ?? '')
+      );
+
+      expect(matchingTitles.every((title) => title.toLowerCase().includes('server'))).toBeTruthy();
+    });
+
+    await test.step('Show the empty state when no games match a search', async () => {
+      const searchInput = page.getByTestId('game-search');
+      await searchInput.fill('definitely-not-a-game');
+
+      await expect(page.getByTestId('empty-state')).toBeVisible();
+      await expect(page.getByTestId('empty-state-text')).toContainText('No games match');
+    });
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
