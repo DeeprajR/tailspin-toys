@@ -64,15 +64,15 @@ const emptyMessage = searchTerm
   </div>
 
   <script>
-    const searchInput = document.querySelector('[data-testid="game-search"]');
-    const searchForm = document.querySelector('[data-testid="game-search-form"]');
-    const gameCards = Array.from(document.querySelectorAll('[data-testid="game-card"]'));
-    const gamesGrid = document.querySelector('[data-testid="games-grid"]');
-    const emptyStateWrapper = document.querySelector('[data-testid="empty-state-wrapper"]');
-    const emptyState = document.querySelector('[data-testid="empty-state"]');
-    const emptyStateText = document.querySelector('[data-testid="empty-state-text"]');
+    const searchInput = document.querySelector<HTMLInputElement>('[data-testid="game-search"]');
+    const searchForm = document.querySelector<HTMLFormElement>('[data-testid="game-search-form"]');
+    const gameCards = Array.from(document.querySelectorAll<HTMLElement>('[data-testid="game-card"]'));
+    const gamesGrid = document.querySelector<HTMLElement>('[data-testid="games-grid"]');
+    const emptyStateWrapper = document.querySelector<HTMLElement>('[data-testid="empty-state-wrapper"]');
+    const emptyState = document.querySelector<HTMLElement>('[data-testid="empty-state"]');
+    const emptyStateText = document.querySelector<HTMLElement>('[data-testid="empty-state-text"]');
 
-    const setVisibility = (element, shouldHide) => {
+    const setVisibility = (element: HTMLElement, shouldHide: boolean): void => {
       if (!element) {
         return;
       }
